@@ -1,0 +1,37 @@
+# BROKEN ON PURPOSE — drill 2.
+# Symptom: the workflow fails perhaps four times out of five, with
+# "Unable to find any artifacts for the associated workflow run".
+# Occasionally it passes, which is worse.
+name: drill-2
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  produce:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - name: Make the thing
+        run: |
+          mkdir -p out
+          echo "$GITHUB_SHA" > out/build-id.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: build-id
+          path: out/
+
+  consume:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: build-id
+      - name: Use the thing
+        run: cat build-id.txt

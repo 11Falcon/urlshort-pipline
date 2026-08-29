@@ -1,0 +1,23 @@
+# BROKEN ON PURPOSE — drill 4.
+# Symptom: a colleague swears they added this workflow last week. The Actions
+# tab has never shown a single run of it. No errors anywhere.
+name: drill-4
+on:
+  push:
+    branches: [master]
+    paths:
+      - "docs/**"
+  pull_request:
+    types: [labeled]
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Prove it ran
+        run: echo "drill-4 ran for ${{ github.sha }}"

@@ -1,0 +1,4 @@
+# Direct dependencies only, with the range you actually support.
+# You will turn this into a fully pinned requirements.lock in module 0x01.
+fastapi>=0.110,<1.0
+uvicorn>=0.27,<1.0

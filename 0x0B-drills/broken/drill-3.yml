@@ -1,0 +1,33 @@
+# BROKEN ON PURPOSE — drill 3.
+# Symptom: none. That is the problem. This workflow has been green for
+# three months and the team trusts it.
+name: drill-3
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install
+        run: pip install -r requirements-dev.txt && pip install -e .
+
+      - name: Run the tests
+        run: pytest tests/ -q || true
+
+      - name: Check the coverage
+        continue-on-error: true
+        run: pytest --cov=src/urlshort --cov-fail-under=95 -q
+
+      - name: Done
+        run: echo "all good"

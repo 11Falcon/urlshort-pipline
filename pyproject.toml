@@ -1,0 +1,57 @@
+[build-system]
+requires = ["hatchling==1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "urlshort"
+version = "0.1.0"
+description = "A tiny URL shortener that exists to be built, tested, shipped and rolled back."
+requires-python = ">=3.11"
+dependencies = [
+    "fastapi",
+    "uvicorn",
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "pytest-cov", "httpx", "ruff", "mypy"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/urlshort"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+markers = [
+    "slow: takes more than a second; excluded from the pull-request gate",
+]
+
+[tool.coverage.run]
+source = ["src/urlshort"]
+branch = true
+
+omit = ["*/__main__.py"]
+
+[tool.coverage.report]
+show_missing = true
+exclude_lines = ["if __name__ == .__main__.:", "pragma: no cover"]
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+# The checker and its kit are course machinery, not your code.
+extend-exclude = ["checker.py", "ci_kit.py", "0x0B-drills"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["urlshort"]
+
+[tool.mypy]
+python_version = "3.11"
+files = ["src/urlshort"]
+strict = true
+
+[[tool.mypy.overrides]]
+module = ["uvicorn.*"]
+ignore_missing_imports = true

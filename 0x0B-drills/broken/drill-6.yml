@@ -1,0 +1,28 @@
+# BROKEN ON PURPOSE — drill 6.
+# Symptom: none yet. It works. It also means anyone on the internet can open
+# a pull request and read your repository secrets.
+name: drill-6
+on:
+  pull_request_target:
+    branches: [main]
+
+permissions: write-all
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+
+      - name: Install and run the contributor's code
+        run: |
+          pip install -r requirements-dev.txt
+          pytest tests/ -q
+
+      - name: Ping the smoke endpoint
+        run: |
+          curl -sS -H "Authorization: Bearer ${{ secrets.SMOKE_TOKEN }}" \
+            https://example.com/ping || echo "(offline is fine)"
