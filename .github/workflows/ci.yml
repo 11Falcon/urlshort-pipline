@@ -1,17 +1,18 @@
-name: ci
-on:
-  push:
+name: ci 
+on: 
+  push: 
     branches: [main]
-  pull_request:
+  pull-request:
 
 jobs:
   test:
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    steps:
+
+    steps:  
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
-      - run: pip install -r requirements-dev.text && pip install -e .
-      - run: pytest -m "not slow"
+          python-verson: "3.11"
+      - run: pip install -r requirement-dev.txt && pip install -e .
+      - run : pytest -m "not slow"
