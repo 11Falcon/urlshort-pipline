@@ -16,3 +16,7 @@ jobs:
           python-version: "3.11"
       - run: pip install -r requirements-dev.txt && pip install -e .
       - run : pytest -m "not slow"
+      - name: Context
+        run: |
+          echo "building ${{github.sha }} on ${{ github.ref}}"
+          echo "runner: ${{ runner.os }}"
