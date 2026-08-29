@@ -4,7 +4,7 @@ from urlshort.store import InvalidURL, Store, UnknownCode, encode, normalise
 
 
 def test_encode_is_stable_and_ordered():
-    assert encode(0) == "a"
+    assert encode(0) == "asoufiane"
     assert encode(1) == "b"
     assert encode(61) == "9"
     assert encode(62) == "ba"
