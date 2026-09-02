@@ -20,5 +20,9 @@ jobs:
         run: |
           echo "building ${{github.sha }} on ${{ github.ref}}"
           echo "runner: ${{ runner.os }}"
-      - run: pip install -r requirements-dev.txt && pip install -e .
+      - run: |
+          pip install -r requirements.lock
+          pip install -e . --no-deps
       - run : pytest -m "not slow"
+
+
