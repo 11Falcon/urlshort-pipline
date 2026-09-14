@@ -33,4 +33,15 @@ jobs:
                 name: dist
                 path: dist/*.whl
                 retention-days : 7
+            
+    verify:
+        needs: first-job
+        runs-on : ubuntu-latest
+        runsout-minutes: 10
+
+        steps:
+            - uses: actions/download-artifact@v4
+                with: {name: dist}
+            
+            - run : pip install ./*.whl && python -c "import urlshort; print(urlshort.__version__)"
 
