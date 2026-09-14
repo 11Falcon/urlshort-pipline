@@ -24,4 +24,13 @@ jobs:
                 restore-keys: ${{runner.os}}-pip-
             - name: install dependencies
               run: pip install -r requirements.lock
+            
+            - name: build dependencies
+              run: pip install build && python -m build --wheel
+
+            - uses: actions/upload-artifact@v4
+              with:
+                name: dist
+                path: dist/*.whl
+                retention-days : 7
 
