@@ -1,47 +1,50 @@
 name: continuous integration
-on:
-    push: 
+on :
+    push:
         branches: 
-            - main
-            - test
+            -   main  
+            -   tests
     pull_request:
 
 jobs:
-    first-job:
+    build:
         runs-on: ubuntu-latest
-        timeout-minutes: 10
-        
+        timeout-minutes: 7
         steps:
             - uses: actions/checkout@v4
             - uses: actions/setup-python@v5
               with:
                 python-version: '3.11'
-            - name: cache
+            - name: cache configuration
               uses: actions/cache@v4
               with:
                 path: ~/.cache/pip
                 key: ${{runner.os}}-pip-${{hashFiles('requirements.lock')}}
                 restore-keys: ${{runner.os}}-pip-
+
             - name: install dependencies
               run: pip install -r requirements.lock
-            
-            - name: build dependencies
-              run: pip install build && python -m build --wheel
 
-            - uses: actions/upload-artifact@v4
+            - name: build artifact
+              run : pip install build && python -m build --wheel
+            
+            - name: upload artifact
+              uses: actions/upload-artifact@v4
               with:
                 name: dist
                 path: dist/*.whl
-                retention-days : 7
-            
-    verify:
-        needs: first-job
-        runs-on : ubuntu-latest
-        runsout-minutes: 10
+                retention-days: 7
 
+    verify: 
+        needs: build
+        runs-on: ubuntu-latest
+        timeout-minutes: 10
+        
         steps:
-            - uses: actions/download-artifact@v4
-                with: {name: dist}
-            
-            - run : pip install ./*.whl && python -c "import urlshort; print(urlshort.__version__)"
-
+            -   uses: actions/setup-python@v5
+                with:
+                    python-version: '3.11'
+            -   uses: actions/download-artifact@v4
+                with:
+                    name: dist
+            - run: pip install ./*.whl && python -c "import urlshort; print(urlshort.__version__)"
