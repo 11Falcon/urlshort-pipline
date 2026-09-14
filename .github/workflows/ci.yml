@@ -48,3 +48,5 @@ jobs:
                 with:
                     name: dist
             - run: pip install ./*.whl && python -c "import urlshort; print(urlshort.__version__)"
+
+            
