@@ -27,6 +27,15 @@ jobs:
       - name: build and upload
         run: pip install build && python -m build --wheel
 
+      - name : testing reproductibility
+        run : |
+          export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+          python -m build --wheel --outdir out1
+          python -m build --wheel --outdir out2
+          for d in out1 out2 ; do 
+            echo " REPRODUCTIBILE $(sha256sum $d/*.whl | cut -d ' ' -f1)"
+          done
+
       - uses: actions/upload-artifact@v4
         with:
           name: dist
@@ -39,7 +48,6 @@ jobs:
     timeout-minutes: 10
 
     steps:
-      - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with: 
           python-version: '3.11'
@@ -49,11 +57,4 @@ jobs:
           name: dist
       - run:  pip install ./*.whl && python -c "import urlshort; print(urlshort.__version__)"
 
-      - name : testing reproductibility
-        run : |
-          export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
-          python -m build --wheel --outdir out1
-          python -m build --wheel --outdir out2
-          for d in out1 out2 ; do 
-            echo " REPRODUCTIBILE $(sha256sum $d/*.whl | cut -d ' ' -f1)"
-          done
+     
