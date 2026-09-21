@@ -1,47 +1,58 @@
 name: memo
+
 on:
   push:
     branches:
-      - main 
+      - main
       - test
   pull_request:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes : 10
+    timeout-minutes: 10
+
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
-      - name: setting cache
+
+      - name: Setting cache
         uses: actions/cache@v4
         with:
           path: ~/.cache/pip
-          key: ${{runner.os}}-pip-${{hashFiles('requirements.lock')}}
-          restore-keys: ${{runner.os}}-pip-
-      - name: install dependencies
-        run: pip install -r requirements.lock
-      
-      - name: build and upload
-        run: pip install build && python -m build --wheel
+          key: ${{ runner.os }}-pip-${{ hashFiles('requirements.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-pip-
 
-      - name : testing reproductibility
-        run : |
+      - name: Install dependencies
+        run: pip install -r requirements.lock
+
+      - name: Build wheel
+        run: |
+          pip install build
+          python -m build --wheel
+
+      - name: Test reproducibility
+        run: |
           export SOURCE_DATE_EPOCH=$(git log -1 --pretty=%ct)
+
           python -m build --wheel --outdir out1
           python -m build --wheel --outdir out2
-          for d in out1 out2 ; do 
-            echo " REPRODUCTIBILE $(sha256sum $d/*.whl | cut -d ' ' -f1)"
+
+          for d in out1 out2; do
+            echo "REPRODUCIBLE $(sha256sum "$d"/*.whl | cut -d ' ' -f1)"
           done
 
-      - uses: actions/upload-artifact@v4
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
         with:
           name: dist
           path: dist/*.whl
           retention-days: 7
-  
+
   verify:
     needs: build
     runs-on: ubuntu-latest
@@ -49,12 +60,14 @@ jobs:
 
     steps:
       - uses: actions/setup-python@v5
-        with: 
+        with:
           python-version: '3.11'
-      
-      - uses: actions/download-artifact@v4
-        with: 
-          name: dist
-      - run:  pip install ./*.whl && python -c "import urlshort; print(urlshort.__version__)"
 
-     
+      - uses: actions/download-artifact@v4
+        with:
+          name: dist
+
+      - name: Verify artifact
+        run: |
+          pip install ./*.whl
+          python -c "import urlshort; print(urlshort.__version__)"
